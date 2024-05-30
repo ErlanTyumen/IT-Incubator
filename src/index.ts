@@ -38,15 +38,16 @@ app.post('/videos', (req: Request, res: Response) => {
     if(!title || typeof title !== 'string' || !title.trim()) {
         res.status(400).send({
             errorsMessages: [{
-                "message": "Incorrect title",
-                "field": "title"
+                message: "Incorrect title",
+                field: "title"
             }],
             resultCode: 1
         })
         return;
     }
+
     const newVideo = {
-        id: +(new Date()),
+        id: +(new Date().toISOString()),
         title: title,
         author: 'it-incubator',
         canBeDownloaded: true,
@@ -73,14 +74,19 @@ app.put('/videos/:videoId', (req: Request, res: Response) => {
         return;
     }
 
-
-    const id = +req.params.videosId
+    const id = +req.params.videoId // Исправлено
     const video = videos.find(v => v.id === id)
     if (video) {
         video.title = req.body.title;
         res.status(204).send(video)
     } else {
-        res.send(404)
+        res.status(404).send({
+            errorsMessages: [{
+                message: "Video not found",
+                field: "id"
+            }],
+            resultCode: 1
+        })
     }
 })
 
@@ -90,19 +96,35 @@ app.get('/videos/:videoId', (req: Request, res: Response) => {
     if (video) {
         res.send(video)
     } else {
-        res.send(404)
+        res.status(404).send({
+            errorsMessages: [{
+                message: "Video not found",
+                field: "id"
+            }],
+            resultCode: 1
+        })
     }
 })
 
-app.delete('/videos/:videosId', (req: Request, res:Response) => {
-    const id = +req.params.videosId;
+app.delete('/videos/:videoId', (req: Request, res: Response) => {
+    const id = +req.params.videoId;
     const newVideos = videos.filter(v => v.id !== id)
     if (newVideos.length < videos.length) {
         videos = newVideos
-        res.send(204)
+        res.status(204).send()
     } else {
-        res.send(404)
+        res.status(404).send({
+            errorsMessages: [{
+                message: "Video not found",
+                field: "id"
+            }],
+            resultCode: 1
+        })
     }
+})
+app.delete('/testing/all-data', (req: Request, res: Response) => {
+    videos = []
+    res.status(204).send
 })
 
 app.listen(port, () => {
