@@ -96,7 +96,7 @@ app.put('/videos/:videoId', (req: Request, res: Response) => {
     }
 
     if (errorsMessages.length > 0) {
-        res.status(400).send({ errorsMessages });
+        res.status(400).send({ errorsMessages, resultCode: 1 });
         return;
     }
 
