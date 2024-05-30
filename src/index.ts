@@ -41,22 +41,34 @@ function addDays(date: Date, days: number): Date {
 
 app.post('/videos', (req: Request, res: Response) => {
     const { title, author, availableResolutions, canBeDownloaded, minAgeRestriction } = req.body;
+    const errorsMessages = [];
 
+    // Проверка title
     if (!title || typeof title !== 'string' || !title.trim() || title.length > 40) {
-        res.status(400).send({
-            errorsMessages: [{
-                message: "Incorrect title",
-                field: "title"
-            }]
-        });
+        errorsMessages.push({ message: "Incorrect title", field: "title" });
+    }
+
+    // Проверка author
+    if (!author || typeof author !== 'string' || !author.trim() || author.length > 20) {
+        errorsMessages.push({ message: "Incorrect author", field: "author" });
+    }
+
+    // Проверка availableResolutions
+    const validResolutions = ["P144", "P240", "P360", "P480", "P720", "P1080", "P1440", "P2160"];
+    if (!Array.isArray(availableResolutions) || !availableResolutions.every((res: any) => validResolutions.includes(res))) {
+        errorsMessages.push({ message: "Incorrect availableResolutions", field: "availableResolutions" });
+    }
+
+    if (errorsMessages.length > 0) {
+        res.status(400).send({ errorsMessages });
         return;
     }
 
     const createdAt = new Date();
     const newVideo = {
-        id: +(new Date()),
+        id: +(new Date()), // Уникальный ID
         title: title,
-        author: author || 'it-incubator',
+        author: author,
         canBeDownloaded: canBeDownloaded || false,
         minAgeRestriction: minAgeRestriction || null,
         createdAt: createdAt.toISOString(),
