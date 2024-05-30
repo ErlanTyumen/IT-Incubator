@@ -33,6 +33,12 @@ app.get('/videos', (req: Request, res: Response) => {
     res.send(videos)
 })
 
+function addDays(date: Date, days: number): Date {
+    let result = new Date(date);
+    result.setDate(date.getDate() + days);
+    return result;
+}
+
 app.post('/videos', (req: Request, res: Response) => {
     let title = req.body.title
     if(!title || typeof title !== 'string' || !title.trim()) {
@@ -44,17 +50,14 @@ app.post('/videos', (req: Request, res: Response) => {
         })
         return;
     }
-    const createdAt = new Date();
-    const publicationDatePlusOneDay = new Date(createdAt.getTime() + 86400000); // +1 день от createdAt
-
     const newVideo = {
         id: +(new Date().getDate()),
         title: title,
         author: 'it-incubator',
         canBeDownloaded: true,
         minAgeRestriction: null,
-        createdAt: createdAt.toISOString(),
-        publicationDate: new Date().toISOString() || publicationDatePlusOneDay.toISOString(),
+        createdAt: (addDays(new Date(), 1).toISOString()),
+        publicationDate: new Date().toISOString(),
         availableResolutions: ["P144"]
     }
     videos.push(newVideo)
