@@ -101,7 +101,7 @@ app.put('/videos/:videoId', (req: Request, res: Response) => {
     }
 
     if (errorsMessages.length > 0) {
-        res.status(400).send({ errorsMessages, resultCode: 1 });
+        res.status(400).send({ errorsMessages });
         return;
     }
 
@@ -121,9 +121,12 @@ app.put('/videos/:videoId', (req: Request, res: Response) => {
             errorsMessages: [{
                 message: "Video not found",
                 field: "id"
-            }],
-            resultCode: 1
-        });
+            },
+                {
+                    message: "Video not found",
+                    field: "id"
+                }]
+            });
     }
 });
 
