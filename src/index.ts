@@ -83,15 +83,20 @@ app.post('/videos', (req: Request, res: Response) => {
 
 app.put('/videos/:videoId', (req: Request, res: Response) => {
     const { title, author, availableResolutions, canBeDownloaded, minAgeRestriction, publicationDate } = req.body;
+    const errorsMessages = [];
 
+    // Проверка title
     if (!title || typeof title !== 'string' || !title.trim() || title.length > 40) {
-        res.status(400).send({
-            errorsMessages: [{
-                message: "Incorrect title",
-                field: "title"
-            }],
-            resultCode: 1
-        });
+        errorsMessages.push({ message: "Incorrect title", field: "title" });
+    }
+
+    // Проверка canBeDownloaded
+    if (typeof canBeDownloaded !== 'boolean') {
+        errorsMessages.push({ message: "Incorrect canBeDownloaded", field: "canBeDownloaded" });
+    }
+
+    if (errorsMessages.length > 0) {
+        res.status(400).send({ errorsMessages });
         return;
     }
 
@@ -111,10 +116,8 @@ app.put('/videos/:videoId', (req: Request, res: Response) => {
             errorsMessages: [{
                 message: "Video not found",
                 field: "id"
-            }, {
-                message: "Video found",
-                field: "canBeDownloaded"
-            }]
+            }],
+            resultCode: 1
         });
     }
 });
