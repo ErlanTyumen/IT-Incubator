@@ -106,7 +106,7 @@ app.put('/videos/:videoId', (req: Request, res: Response) => {
     }
 
     // Проверка publicationDate
-    if (publicationDate && (typeof publicationDate !== 'string' || isNaN(Date.parse(publicationDate)))) {
+    if (publicationDate && (typeof publicationDate === 'string' || !isNaN(Date.parse(publicationDate)))) {
         errorsMessages.push({ message: "Incorrect publicationDate", field: "publicationDate" });
     }
 
@@ -162,7 +162,10 @@ app.delete('/videos/:videoId', (req: Request, res: Response) => {
             errorsMessages: [{
                 message: "Video not found",
                 field: "id"
-            }]
+            }, {
+                message: "Video not found",
+                field: "id"
+                }]
         });
     }
 });
