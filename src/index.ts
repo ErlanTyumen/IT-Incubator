@@ -154,8 +154,10 @@ app.delete('/videos/:videoId', (req: Request, res: Response) => {
             errorsMessages: [{
                 message: "Video not found",
                 field: "id"
-            }],
-            resultCode: 1
+            }, {
+                message: "Video not found",
+                field: "id"
+            }]
         });
     }
 });
