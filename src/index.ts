@@ -1,13 +1,13 @@
-import express, { Request, Response } from 'express'
-import cors from 'cors'
-import bodyParser from 'body-parser'
+import express, { Request, Response } from 'express';
+import cors from 'cors';
+import bodyParser from 'body-parser';
 
-const app = express()
+const app = express();
 
-const corsMiddleWare = cors()
-app.use(corsMiddleWare)
-const jsonBodyMiddleWare = bodyParser.json()
-app.use(jsonBodyMiddleWare)
+const corsMiddleWare = cors();
+app.use(corsMiddleWare);
+const jsonBodyMiddleWare = bodyParser.json();
+app.use(jsonBodyMiddleWare);
 
 let videos = [
     {
@@ -22,16 +22,16 @@ let videos = [
             "P144"
         ]
     }
-]
+];
 
-const port = process.env.PORT || 5000
+const port = process.env.PORT || 5000;
 
-const parserMiddleware = express.json()
-app.use(parserMiddleware)
+const parserMiddleware = express.json();
+app.use(parserMiddleware);
 
 app.get('/videos', (req: Request, res: Response) => {
-    res.send(videos)
-})
+    res.send(videos);
+});
 
 function addDays(date: Date, days: number): Date {
     let result = new Date(date);
@@ -40,33 +40,38 @@ function addDays(date: Date, days: number): Date {
 }
 
 app.post('/videos', (req: Request, res: Response) => {
-    let title = req.body.title
-    if(!title || typeof title !== 'string' || !title.trim()) {
+    const { title, author, availableResolutions, canBeDownloaded, minAgeRestriction } = req.body;
+
+    if (!title || typeof title !== 'string' || !title.trim() || title.length > 40) {
         res.status(400).send({
             errorsMessages: [{
                 message: "Incorrect title",
                 field: "title"
             }]
-        })
+        });
         return;
     }
-    const newVideo = {
-        id: +(new Date().getDate()),
-        title: title,
-        author: 'it-incubator',
-        canBeDownloaded: true,
-        minAgeRestriction: null,
-        createdAt: new Date().toISOString(),
-        publicationDate: (addDays(new Date(), 1).toISOString()),
-        availableResolutions: ["P144"]
-    }
-    videos.push(newVideo)
 
-    res.status(201).send(newVideo)
-})
+    const createdAt = new Date();
+    const newVideo = {
+        id: +(new Date()),
+        title: title,
+        author: author || 'it-incubator',
+        canBeDownloaded: canBeDownloaded || false,
+        minAgeRestriction: minAgeRestriction || null,
+        createdAt: createdAt.toISOString(),
+        publicationDate: addDays(createdAt, 1).toISOString(),
+        availableResolutions: availableResolutions || ["P144"]
+    };
+
+    videos.push(newVideo);
+
+    res.status(201).send(newVideo);
+});
 
 app.put('/videos/:videoId', (req: Request, res: Response) => {
-    let title = req.body.title
+    const { title, author, availableResolutions, canBeDownloaded, minAgeRestriction, publicationDate } = req.body;
+
     if (!title || typeof title !== 'string' || !title.trim() || title.length > 40) {
         res.status(400).send({
             errorsMessages: [{
@@ -74,41 +79,71 @@ app.put('/videos/:videoId', (req: Request, res: Response) => {
                 field: "title"
             }],
             resultCode: 1
-        })
+        });
         return;
     }
 
-    const id = +req.params.videoId // Исправлено
-    const video = videos.find(v => v.id === id)
+    const id = +req.params.videoId;
+    const video = videos.find(v => v.id === id);
     if (video) {
-        video.title = req.body.title;
-        res.status(204).send(video)
+        video.title = title;
+        video.author = author || video.author;
+        video.availableResolutions = availableResolutions || video.availableResolutions;
+        video.canBeDownloaded = typeof canBeDownloaded === 'boolean' ? canBeDownloaded : video.canBeDownloaded;
+        video.minAgeRestriction = minAgeRestriction || video.minAgeRestriction;
+        video.publicationDate = publicationDate || video.publicationDate;
+
+        res.status(204).send(video);
     } else {
-        res.send(404)
+        res.status(404).send({
+            errorsMessages: [{
+                message: "Video not found",
+                field: "id"
+            }],
+            resultCode: 1
+        });
     }
-})
+});
 
 app.get('/videos/:videoId', (req: Request, res: Response) => {
     const id = +req.params.videoId;
-    const video = videos.find(v => v.id === id)
+    const video = videos.find(v => v.id === id);
     if (video) {
-        res.send(video)
+        res.send(video);
     } else {
-        res.send(404)
+        res.status(404).send({
+            errorsMessages: [{
+                message: "Video not found",
+                field: "id"
+            }],
+            resultCode: 1
+        });
     }
-})
+});
 
 app.delete('/videos/:videoId', (req: Request, res: Response) => {
     const id = +req.params.videoId;
-    const newVideos = videos.filter(v => v.id !== id)
+    const newVideos = videos.filter(v => v.id !== id);
     if (newVideos.length < videos.length) {
-        videos = newVideos
-        res.status(204).send()
+        videos = newVideos;
+        res.status(204).send();
     } else {
-        res.send(404)
+        res.status(404).send({
+            errorsMessages: [{
+                message: "Video not found",
+                field: "id"
+            }],
+            resultCode: 1
+        });
     }
-})
+});
+
+// Новый маршрут для удаления всех данных
+app.delete('/testing/all-data', (req: Request, res: Response) => {
+    videos = [];
+    res.status(204).send();
+});
 
 app.listen(port, () => {
-    console.log(`Example app listening on port: ${port}`)
-})
+    console.log(`Example app listening on port: ${port}`);
+});
