@@ -51,7 +51,7 @@ app.post('/videos', (req: Request, res: Response) => {
         author: 'it-incubator',
         canBeDownloaded: true,
         minAgeRestriction: null,
-        createdAt: new Date(new Date().getTime() - 86400000).toISOString(),
+        createdAt: new Date(new Date().getTime() + 86400000).toISOString(),
         publicationDate: new Date().toISOString(),
         availableResolutions: ["P144"]
     }
