@@ -106,7 +106,7 @@ app.put('/videos/:videoId', (req: Request, res: Response) => {
     }
 
     // Проверка publicationDate
-    if (publicationDate && isNaN(Date.parse(publicationDate))) {
+    if (publicationDate && (typeof publicationDate !== 'string' || isNaN(Date.parse(publicationDate)))) {
         errorsMessages.push({ message: "Incorrect publicationDate", field: "publicationDate" });
     }
 
