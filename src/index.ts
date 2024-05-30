@@ -57,7 +57,7 @@ app.post('/videos', (req: Request, res: Response) => {
         canBeDownloaded: true,
         minAgeRestriction: null,
         createdAt: new Date().toISOString(),
-        publicationDate: (addDays(new Date(), 1).toISOString()) || new Date().toISOString(),
+        publicationDate: (addDays(new Date(), 1).toISOString()),
         availableResolutions: ["P144"]
     }
     videos.push(newVideo)
