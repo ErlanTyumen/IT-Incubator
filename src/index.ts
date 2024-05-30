@@ -121,12 +121,8 @@ app.put('/videos/:videoId', (req: Request, res: Response) => {
             errorsMessages: [{
                 message: "Video not found",
                 field: "id"
-            },
-                {
-                    message: "Video not found",
-                    field: "id"
-                }]
-            });
+            }]
+        });
     }
 });
 
@@ -138,9 +134,6 @@ app.get('/videos/:videoId', (req: Request, res: Response) => {
     } else {
         res.status(404).send({
             errorsMessages: [{
-                message: "Video not found",
-                field: "id"
-            }, {
                 message: "Video not found",
                 field: "id"
             }]
@@ -157,9 +150,6 @@ app.delete('/videos/:videoId', (req: Request, res: Response) => {
     } else {
         res.status(404).send({
             errorsMessages: [{
-                message: "Video not found",
-                field: "id"
-            }, {
                 message: "Video not found",
                 field: "id"
             }]
