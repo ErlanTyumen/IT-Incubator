@@ -63,7 +63,7 @@ app.post('/videos', (req: Request, res: Response) => {
 
 app.put('/videos/:videoId', (req: Request, res: Response) => {
     let title = req.body.title
-    if (!title || typeof title !== 'string' || !title.trim()) {
+    if (!title || typeof title !== 'string' || !title.trim() || title.length > 40) {
         res.status(400).send({
             errorsMessages: [{
                 message: "Incorrect title",
@@ -80,13 +80,7 @@ app.put('/videos/:videoId', (req: Request, res: Response) => {
         video.title = req.body.title;
         res.status(204).send(video)
     } else {
-        res.status(404).send({
-            errorsMessages: [{
-                message: "Video not found",
-                field: "id"
-            }],
-            resultCode: 1
-        })
+        res.send(404)
     }
 })
 
@@ -96,30 +90,18 @@ app.get('/videos/:videoId', (req: Request, res: Response) => {
     if (video) {
         res.send(video)
     } else {
-        res.status(404).send({
-            errorsMessages: [{
-                message: "Video not found",
-                field: "id"
-            }],
-            resultCode: 1
-        })
+        res.send(404)
     }
 })
 
 app.delete('/videos/:videoId', (req: Request, res: Response) => {
-    const id = +req.params.videoId; // Исправлено
+    const id = +req.params.videoId;
     const newVideos = videos.filter(v => v.id !== id)
     if (newVideos.length < videos.length) {
         videos = newVideos
         res.status(204).send()
     } else {
-        res.status(404).send({
-            errorsMessages: [{
-                message: "Video not found",
-                field: "id"
-            }],
-            resultCode: 1
-        })
+        res.send(404)
     }
 })
 
