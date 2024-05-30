@@ -47,7 +47,7 @@ app.post('/videos', (req: Request, res: Response) => {
     }
 
     const newVideo = {
-        id: +(new Date().toISOString()),
+        id: +(new Date()),
         title: title,
         author: 'it-incubator',
         canBeDownloaded: true,
@@ -62,55 +62,22 @@ app.post('/videos', (req: Request, res: Response) => {
 })
 
 app.put('/videos/:videoId', (req: Request, res: Response) => {
-    const { title, author, availableResolutions, canBeDownloaded, minAgeRestriction, publicationDate } = req.body;
-
-    const errorsMessages = [];
-
-    // Проверка title
+    let title = req.body.title
     if (!title || typeof title !== 'string' || !title.trim()) {
-        errorsMessages.push({ message: "Incorrect title", field: "title" });
-    }
-
-    // Проверка author
-    if (!author || typeof author !== 'string' || !author.trim()) {
-        errorsMessages.push({ message: "Incorrect author", field: "author" });
-    }
-
-    // Проверка availableResolutions
-    if (!Array.isArray(availableResolutions) || !availableResolutions.every((res: any) => typeof res === 'string')) {
-        errorsMessages.push({ message: "Incorrect availableResolutions", field: "availableResolutions" });
-    }
-
-    // Проверка canBeDownloaded
-    if (typeof canBeDownloaded !== 'boolean') {
-        errorsMessages.push({ message: "Incorrect canBeDownloaded", field: "canBeDownloaded" });
-    }
-
-    // Проверка minAgeRestriction
-    if (minAgeRestriction !== null && (typeof minAgeRestriction !== 'number' || minAgeRestriction < 0)) {
-        errorsMessages.push({ message: "Incorrect minAgeRestriction", field: "minAgeRestriction" });
-    }
-
-    // Проверка publicationDate
-    if (!publicationDate || isNaN(Date.parse(publicationDate))) {
-        errorsMessages.push({ message: "Incorrect publicationDate", field: "publicationDate" });
-    }
-
-    // Если есть ошибки, возвращаем 400 и список ошибок
-    if (errorsMessages.length > 0) {
-        res.status(400).send({ errorsMessages, resultCode: 1 });
+        res.status(400).send({
+            errorsMessages: [{
+                message: "Incorrect title",
+                field: "title"
+            }],
+            resultCode: 1
+        })
         return;
     }
 
-    const id = +req.params.videoId
+    const id = +req.params.videoId // Исправлено
     const video = videos.find(v => v.id === id)
     if (video) {
-        video.title = title;
-        video.author = author;
-        video.availableResolutions = availableResolutions;
-        video.canBeDownloaded = canBeDownloaded;
-        video.minAgeRestriction = minAgeRestriction;
-        video.publicationDate = publicationDate;
+        video.title = req.body.title;
         res.status(204).send(video)
     } else {
         res.status(404).send({
@@ -140,7 +107,7 @@ app.get('/videos/:videoId', (req: Request, res: Response) => {
 })
 
 app.delete('/videos/:videoId', (req: Request, res: Response) => {
-    const id = +req.params.videoId;
+    const id = +req.params.videoId; // Исправлено
     const newVideos = videos.filter(v => v.id !== id)
     if (newVideos.length < videos.length) {
         videos = newVideos
@@ -154,10 +121,6 @@ app.delete('/videos/:videoId', (req: Request, res: Response) => {
             resultCode: 1
         })
     }
-})
-app.delete('/testing/all-data', (req: Request, res: Response) => {
-    videos = []
-    res.status(204).send
 })
 
 app.listen(port, () => {
