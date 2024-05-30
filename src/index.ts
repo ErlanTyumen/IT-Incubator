@@ -90,6 +90,11 @@ app.put('/videos/:videoId', (req: Request, res: Response) => {
         errorsMessages.push({ message: "Incorrect title", field: "title" });
     }
 
+    // Проверка author
+    if (!author || typeof author !== 'string' || !author.trim() || author.length > 20) {
+        errorsMessages.push({ message: "Incorrect author", field: "author" });
+    }
+
     // Проверка canBeDownloaded
     if (typeof canBeDownloaded !== 'boolean') {
         errorsMessages.push({ message: "Incorrect canBeDownloaded", field: "canBeDownloaded" });
@@ -98,6 +103,11 @@ app.put('/videos/:videoId', (req: Request, res: Response) => {
     // Проверка minAgeRestriction
     if (minAgeRestriction !== undefined && (typeof minAgeRestriction !== 'number' || minAgeRestriction < 1 || minAgeRestriction > 18)) {
         errorsMessages.push({ message: "Incorrect minAgeRestriction", field: "minAgeRestriction" });
+    }
+
+    // Проверка publicationDate
+    if (publicationDate && isNaN(Date.parse(publicationDate))) {
+        errorsMessages.push({ message: "Incorrect publicationDate", field: "publicationDate" });
     }
 
     if (errorsMessages.length > 0) {
