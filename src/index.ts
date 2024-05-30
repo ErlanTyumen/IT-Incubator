@@ -111,12 +111,10 @@ app.put('/videos/:videoId', (req: Request, res: Response) => {
             errorsMessages: [{
                 message: "Video not found",
                 field: "id"
-            },
-                {
-                    message: "Video found",
-                    field: "canBeDownloaded"
-                }]
-
+            }, {
+                message: "Video found",
+                field: "canBeDownloaded"
+            }]
         });
     }
 });
