@@ -44,6 +44,8 @@ app.post('/videos', (req: Request, res: Response) => {
         })
         return;
     }
+    const createdAt = new Date();
+    const publicationDatePlusOneDay = new Date(createdAt.getTime() + 86400000); // +1 день от createdAt
 
     const newVideo = {
         id: +(new Date().getDate()),
@@ -51,8 +53,8 @@ app.post('/videos', (req: Request, res: Response) => {
         author: 'it-incubator',
         canBeDownloaded: true,
         minAgeRestriction: null,
-        createdAt: new Date(new Date().getTime() + 86400000).toISOString(),
-        publicationDate: new Date().toISOString(),
+        createdAt: createdAt.toISOString(),
+        publicationDate: new Date().toISOString() || publicationDatePlusOneDay.toISOString(),
         availableResolutions: ["P144"]
     }
     videos.push(newVideo)
