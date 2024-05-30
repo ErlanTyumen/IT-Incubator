@@ -95,6 +95,11 @@ app.put('/videos/:videoId', (req: Request, res: Response) => {
         errorsMessages.push({ message: "Incorrect canBeDownloaded", field: "canBeDownloaded" });
     }
 
+    // Проверка minAgeRestriction
+    if (minAgeRestriction !== undefined && (typeof minAgeRestriction !== 'number' || minAgeRestriction < 1 || minAgeRestriction > 18)) {
+        errorsMessages.push({ message: "Incorrect minAgeRestriction", field: "minAgeRestriction" });
+    }
+
     if (errorsMessages.length > 0) {
         res.status(400).send({ errorsMessages, resultCode: 1 });
         return;
@@ -106,8 +111,8 @@ app.put('/videos/:videoId', (req: Request, res: Response) => {
         video.title = title;
         video.author = author || video.author;
         video.availableResolutions = availableResolutions || video.availableResolutions;
-        video.canBeDownloaded = typeof canBeDownloaded === 'boolean' ? canBeDownloaded : video.canBeDownloaded;
-        video.minAgeRestriction = minAgeRestriction || video.minAgeRestriction;
+        video.canBeDownloaded = canBeDownloaded;
+        video.minAgeRestriction = minAgeRestriction;
         video.publicationDate = publicationDate || video.publicationDate;
 
         res.status(204).send(video);
