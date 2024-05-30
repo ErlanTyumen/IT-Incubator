@@ -62,22 +62,55 @@ app.post('/videos', (req: Request, res: Response) => {
 })
 
 app.put('/videos/:videoId', (req: Request, res: Response) => {
-    let title = req.body.title
+    const { title, author, availableResolutions, canBeDownloaded, minAgeRestriction, publicationDate } = req.body;
+
+    const errorsMessages = [];
+
+    // Проверка title
     if (!title || typeof title !== 'string' || !title.trim()) {
-        res.status(400).send({
-            errorsMessages: [{
-                message: "Incorrect title",
-                field: "title"
-            }],
-            resultCode: 1
-        })
+        errorsMessages.push({ message: "Incorrect title", field: "title" });
+    }
+
+    // Проверка author
+    if (!author || typeof author !== 'string' || !author.trim()) {
+        errorsMessages.push({ message: "Incorrect author", field: "author" });
+    }
+
+    // Проверка availableResolutions
+    if (!Array.isArray(availableResolutions) || !availableResolutions.every((res: any) => typeof res === 'string')) {
+        errorsMessages.push({ message: "Incorrect availableResolutions", field: "availableResolutions" });
+    }
+
+    // Проверка canBeDownloaded
+    if (typeof canBeDownloaded !== 'boolean') {
+        errorsMessages.push({ message: "Incorrect canBeDownloaded", field: "canBeDownloaded" });
+    }
+
+    // Проверка minAgeRestriction
+    if (minAgeRestriction !== null && (typeof minAgeRestriction !== 'number' || minAgeRestriction < 0)) {
+        errorsMessages.push({ message: "Incorrect minAgeRestriction", field: "minAgeRestriction" });
+    }
+
+    // Проверка publicationDate
+    if (!publicationDate || isNaN(Date.parse(publicationDate))) {
+        errorsMessages.push({ message: "Incorrect publicationDate", field: "publicationDate" });
+    }
+
+    // Если есть ошибки, возвращаем 400 и список ошибок
+    if (errorsMessages.length > 0) {
+        res.status(400).send({ errorsMessages, resultCode: 1 });
         return;
     }
 
-    const id = +req.params.videoId // Исправлено
+    const id = +req.params.videoId
     const video = videos.find(v => v.id === id)
     if (video) {
-        video.title = req.body.title;
+        video.title = title;
+        video.author = author;
+        video.availableResolutions = availableResolutions;
+        video.canBeDownloaded = canBeDownloaded;
+        video.minAgeRestriction = minAgeRestriction;
+        video.publicationDate = publicationDate;
         res.status(204).send(video)
     } else {
         res.status(404).send({
